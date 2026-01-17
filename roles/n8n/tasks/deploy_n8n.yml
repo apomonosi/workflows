@@ -1,0 +1,50 @@
+---
+# Deploy n8n using Docker Compose
+
+- name: Create n8n directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ n8n_docker_compose_dir }}"
+    - "{{ n8n_data_dir }}"
+    - "{{ n8n_config_dir }}"
+
+- name: Build n8n environment variables
+  ansible.builtin.set_fact:
+    n8n_environment:
+      TZ: "{{ n8n_timezone }}"
+      N8N_PORT: "{{ n8n_port }}"
+      N8N_BASIC_AUTH_ACTIVE: "{{ 'true' if n8n_basic_auth_active else 'false' }}"
+      N8N_BASIC_AUTH_USER: "{{ n8n_basic_auth_user }}"
+      N8N_BASIC_AUTH_PASSWORD: "{{ n8n_basic_auth_password }}"
+      WEBHOOK_URL: "{{ n8n_webhook_url }}"
+      DB_TYPE: "{{ n8n_db_type }}"
+      N8N_EXECUTIONS_MODE: "{{ n8n_executions_mode }}"
+
+- name: Merge custom environment variables
+  ansible.builtin.set_fact:
+    n8n_environment: "{{ n8n_environment | combine(n8n_env_vars) }}"
+  when: n8n_env_vars | length > 0
+
+- name: Create docker-compose.yml for n8n
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ n8n_docker_compose_dir }}/docker-compose.yml"
+    mode: '0644'
+  notify: Restart n8n
+
+- name: Deploy n8n container
+  community.docker.docker_compose:
+    project_src: "{{ n8n_docker_compose_dir }}"
+    state: present
+    pull: yes
+  register: n8n_deploy
+
+- name: Wait for n8n to be ready
+  ansible.builtin.wait_for:
+    port: "{{ n8n_port }}"
+    delay: 5
+    timeout: 60
+  when: n8n_deploy.changed

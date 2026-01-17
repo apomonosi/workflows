@@ -1,0 +1,14 @@
+---
+# tasks file for n8n
+
+- name: Include Docker installation tasks
+  ansible.builtin.include_tasks: install_docker.yml
+  tags:
+    - docker
+    - install
+
+- name: Include n8n deployment tasks
+  ansible.builtin.include_tasks: deploy_n8n.yml
+  tags:
+    - n8n
+    - deploy

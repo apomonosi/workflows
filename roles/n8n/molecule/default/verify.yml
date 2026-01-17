@@ -1,0 +1,74 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Check if Docker is installed
+      ansible.builtin.command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Verify Docker is installed
+      ansible.builtin.assert:
+        that:
+          - docker_version.rc == 0
+        fail_msg: "Docker is not installed"
+        success_msg: "Docker is installed"
+
+    - name: Check if Docker service is running
+      ansible.builtin.systemd:
+        name: docker
+      register: docker_service
+
+    - name: Verify Docker service is running
+      ansible.builtin.assert:
+        that:
+          - docker_service.status.ActiveState == "active"
+        fail_msg: "Docker service is not running"
+        success_msg: "Docker service is running"
+
+    - name: Check if n8n container is running
+      ansible.builtin.command: docker ps --filter "name=n8n" --format "{{ '{{' }}.Names{{ '}}' }}"
+      register: n8n_container
+      changed_when: false
+
+    - name: Verify n8n container exists
+      ansible.builtin.assert:
+        that:
+          - "'n8n' in n8n_container.stdout"
+        fail_msg: "n8n container is not running"
+        success_msg: "n8n container is running"
+
+    - name: Check if n8n directories exist
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: n8n_dirs
+      loop:
+        - /opt/n8n
+        - /opt/n8n/data
+        - /opt/n8n/config
+
+    - name: Verify n8n directories exist
+      ansible.builtin.assert:
+        that:
+          - item.stat.exists
+          - item.stat.isdir
+        fail_msg: "n8n directory {{ item.item }} does not exist"
+        success_msg: "n8n directory {{ item.item }} exists"
+      loop: "{{ n8n_dirs.results }}"
+
+    - name: Check if n8n is responding on port 5678
+      ansible.builtin.wait_for:
+        port: 5678
+        timeout: 30
+      register: n8n_port_check
+      ignore_errors: true
+
+    - name: Verify n8n is listening on the correct port
+      ansible.builtin.assert:
+        that:
+          - n8n_port_check is not failed
+        fail_msg: "n8n is not listening on port 5678"
+        success_msg: "n8n is listening on port 5678"

@@ -1,0 +1,20 @@
+version: '{{ n8n_docker_compose_version }}'
+
+services:
+  n8n:
+    image: {{ n8n_docker_image }}:{{ n8n_version }}
+    container_name: {{ n8n_container_name }}
+    restart: {{ n8n_restart_policy }}
+    ports:
+      - "{{ n8n_port }}:5678"
+    environment:
+{% for key, value in n8n_environment.items() %}
+{% if value != '' %}
+      {{ key }}: "{{ value }}"
+{% endif %}
+{% endfor %}
+    volumes:
+      - {{ n8n_data_dir }}:/home/node/.n8n
+{% if n8n_config_dir %}
+      - {{ n8n_config_dir }}:/config
+{% endif %}

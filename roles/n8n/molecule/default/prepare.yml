@@ -1,0 +1,11 @@
+---
+- name: Prepare
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Update package cache
+      ansible.builtin.dnf:
+        update_cache: yes
+      changed_when: false

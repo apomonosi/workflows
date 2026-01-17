@@ -1,0 +1,37 @@
+---
+# defaults file for n8n
+
+# n8n configuration
+n8n_version: "latest"
+n8n_port: 5678
+n8n_data_dir: /opt/n8n/data
+n8n_config_dir: /opt/n8n/config
+
+# Docker configuration
+n8n_docker_image: "n8nio/n8n"
+n8n_container_name: "n8n"
+n8n_restart_policy: "unless-stopped"
+
+# n8n environment variables
+n8n_timezone: "UTC"
+n8n_basic_auth_active: false
+n8n_basic_auth_user: ""
+n8n_basic_auth_password: ""
+
+# n8n webhook configuration
+n8n_webhook_url: ""
+
+# n8n database (default is SQLite, can be configured for PostgreSQL/MySQL)
+n8n_db_type: "sqlite"
+
+# n8n execution mode
+n8n_executions_mode: "regular"
+
+# Docker Compose configuration
+n8n_docker_compose_version: "3.8"
+n8n_docker_compose_dir: /opt/n8n
+
+# Additional environment variables (key-value pairs)
+n8n_env_vars: {}
+#  EXAMPLE_VAR: "example_value"
+#  N8N_ENCRYPTION_KEY: "your-encryption-key"

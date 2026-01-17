@@ -1,0 +1,8 @@
+---
+# handlers file for n8n
+
+- name: Restart n8n
+  community.docker.docker_compose:
+    project_src: "{{ n8n_docker_compose_dir }}"
+    state: present
+    restarted: yes
