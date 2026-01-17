@@ -12,3 +12,10 @@
   tags:
     - n8n
     - deploy
+
+- name: Include MCP server deployment tasks
+  ansible.builtin.include_tasks: deploy_mcp_server.yml
+  when: deploy_mcp_server | bool
+  tags:
+    - mcp
+    - ai

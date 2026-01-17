@@ -1,6 +1,14 @@
-# n8n Ansible Deployment
+# n8n Ansible Deployment with AI Integration
 
-This repository contains an Ansible role for deploying [n8n](https://n8n.io/) workflow automation tool on CentOS/RHEL/Rocky Linux systems using Docker.
+This repository contains an Ansible role for deploying [n8n](https://n8n.io/) workflow automation tool on CentOS/RHEL/Rocky Linux systems using Docker, with optional MCP (Model Context Protocol) server integration for Claude AI.
+
+## 🎯 Key Features
+
+- **Automated n8n Deployment**: Complete Docker-based n8n installation
+- **AI-Powered Workflow Creation**: Optional MCP server enables Claude to create and manage workflows
+- **Testing Infrastructure**: Molecule tests for role validation
+- **Production Ready**: Configurable authentication, databases, and security settings
+- **Autonomous Development**: Perfect for AI-assisted automation development
 
 ## Quick Start
 
@@ -58,6 +66,50 @@ Once deployed, access n8n in your browser:
 http://your-server-ip:5678
 ```
 
+## 🤖 Claude AI Integration (Optional)
+
+This repository includes an MCP (Model Context Protocol) server that enables Claude AI to create and manage n8n workflows through natural language!
+
+### What is MCP?
+
+MCP allows Claude to interact directly with n8n's API, enabling you to:
+
+- **Create workflows** by describing what you want in plain English
+- **Modify existing workflows** with simple instructions
+- **Execute and monitor** workflows through conversation
+- **Discover nodes** and capabilities without reading documentation
+
+### Quick Enable
+
+Add to your playbook:
+
+```yaml
+vars:
+  deploy_mcp_server: true
+  mcp_server_repo: https://github.com/your-org/workflows.git
+```
+
+Then deploy:
+
+```bash
+ansible-playbook -i inventory.ini playbook.yml
+```
+
+### Using with Claude
+
+After deployment, configure Claude Desktop with the generated config file from `/opt/n8n-mcp-server/claude_desktop_config.json`.
+
+Example conversations:
+
+```
+You: "Create a workflow that sends me a Slack message every morning at 9 AM with the weather"
+
+Claude: I'll create a daily weather notification workflow for you...
+[Creates complete workflow with Schedule Trigger, Weather API, and Slack nodes]
+```
+
+See [`mcp-server-n8n/README.md`](mcp-server-n8n/README.md) for detailed setup and usage.
+
 ## Repository Structure
 
 ```
@@ -66,6 +118,13 @@ http://your-server-ip:5678
 ├── inventory.ini                # Ansible inventory file
 ├── playbook.yml                 # Example playbook for deploying n8n
 ├── README.md                    # This file
+├── mcp-server-n8n/              # MCP server for Claude AI integration
+│   ├── README.md                # MCP server documentation
+│   ├── src/                     # MCP server source code
+│   ├── docs/                    # Examples and guides
+│   ├── config/                  # Configuration templates
+│   ├── Dockerfile               # Container image
+│   └── docker-compose.yml       # Compose setup
 └── roles/
     └── n8n/                     # n8n Ansible role
         ├── README.md            # Role documentation

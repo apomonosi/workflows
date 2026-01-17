@@ -6,3 +6,9 @@
     project_src: "{{ n8n_docker_compose_dir }}"
     state: present
     restarted: yes
+
+- name: Restart MCP server service
+  ansible.builtin.systemd:
+    name: n8n-mcp-server
+    state: restarted
+    daemon_reload: yes

@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "n8n": {
+      "command": "{{ mcp_server_python_version }}",
+      "args": ["-m", "n8n_mcp_server"],
+      "env": {
+        "N8N_BASE_URL": "http://{{ ansible_default_ipv4.address | default('localhost') }}:{{ n8n_port }}",
+{% if n8n_basic_auth_active %}
+        "N8N_USERNAME": "{{ n8n_basic_auth_user }}",
+        "N8N_PASSWORD": "{{ n8n_basic_auth_password }}"
+{% endif %}
+      }
+    }
+  }
+}

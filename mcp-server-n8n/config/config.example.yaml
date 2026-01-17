@@ -1,0 +1,21 @@
+# n8n MCP Server Configuration Example
+
+# n8n connection settings
+n8n:
+  # Base URL of your n8n instance
+  base_url: "http://localhost:5678"
+
+  # Authentication method 1: API Key (recommended)
+  api_key: "your-n8n-api-key-here"
+
+  # Authentication method 2: Basic Auth (alternative)
+  # username: "admin"
+  # password: "password"
+
+# MCP Server settings
+server:
+  # Server name
+  name: "n8n-mcp-server"
+
+  # Log level (DEBUG, INFO, WARNING, ERROR)
+  log_level: "INFO"

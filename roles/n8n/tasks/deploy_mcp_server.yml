@@ -1,0 +1,59 @@
+---
+# Deploy n8n MCP Server for Claude AI integration
+
+- name: Install Python 3.11 and pip
+  ansible.builtin.dnf:
+    name:
+      - python3.11
+      - python3.11-pip
+      - python3.11-devel
+      - git
+    state: present
+
+- name: Create MCP server directory
+  ansible.builtin.file:
+    path: "{{ mcp_server_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Clone MCP server repository
+  ansible.builtin.git:
+    repo: "{{ mcp_server_repo }}"
+    dest: "{{ mcp_server_dir }}/repo"
+    version: "{{ mcp_server_repo_branch }}"
+    force: yes
+  register: mcp_repo_clone
+
+- name: Install MCP server Python dependencies
+  ansible.builtin.pip:
+    requirements: "{{ mcp_server_dir }}/repo/mcp-server-n8n/pyproject.toml"
+    executable: pip3.11
+    state: present
+    extra_args: "-e {{ mcp_server_dir }}/repo/mcp-server-n8n"
+
+- name: Create MCP server environment file
+  ansible.builtin.template:
+    src: mcp-server.env.j2
+    dest: "{{ mcp_server_dir }}/.env"
+    mode: '0600'
+  notify: Restart MCP server service
+
+- name: Create MCP server systemd service
+  ansible.builtin.template:
+    src: mcp-server.service.j2
+    dest: /etc/systemd/system/n8n-mcp-server.service
+    mode: '0644'
+  notify: Restart MCP server service
+
+- name: Enable and start MCP server service
+  ansible.builtin.systemd:
+    name: n8n-mcp-server
+    enabled: yes
+    state: started
+    daemon_reload: yes
+
+- name: Create MCP server configuration guide
+  ansible.builtin.template:
+    src: mcp-claude-config.json.j2
+    dest: "{{ mcp_server_dir }}/claude_desktop_config.json"
+    mode: '0644'

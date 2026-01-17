@@ -1,0 +1,18 @@
+[Unit]
+Description=n8n MCP Server for Claude AI Integration
+After=network.target docker.service
+Wants=docker.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory={{ mcp_server_dir }}
+EnvironmentFile={{ mcp_server_dir }}/.env
+ExecStart={{ mcp_server_python_version }} -m n8n_mcp_server
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

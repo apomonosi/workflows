@@ -35,3 +35,10 @@ n8n_docker_compose_dir: /opt/n8n
 n8n_env_vars: {}
 #  EXAMPLE_VAR: "example_value"
 #  N8N_ENCRYPTION_KEY: "your-encryption-key"
+
+# MCP Server configuration
+deploy_mcp_server: false
+mcp_server_dir: /opt/n8n-mcp-server
+mcp_server_repo: https://github.com/your-org/workflows.git
+mcp_server_repo_branch: main
+mcp_server_python_version: "python3.11"

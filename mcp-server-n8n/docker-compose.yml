@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - TZ=UTC
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=admin123
+      - N8N_API_KEY_AUTH_ACTIVE=true
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - n8n-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  mcp-server:
+    build: .
+    container_name: n8n-mcp-server
+    restart: unless-stopped
+    environment:
+      - N8N_BASE_URL=http://n8n:5678
+      - N8N_USERNAME=admin
+      - N8N_PASSWORD=admin123
+    depends_on:
+      n8n:
+        condition: service_healthy
+    networks:
+      - n8n-network
+    stdin_open: true
+    tty: true
+
+volumes:
+  n8n_data:
+    driver: local
+
+networks:
+  n8n-network:
+    driver: bridge
